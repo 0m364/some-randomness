@@ -47,4 +47,3 @@ def play_roulette():
 
 # Start the roulette game
 play_roulette()
-`
