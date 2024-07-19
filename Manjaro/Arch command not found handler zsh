@@ -1,0 +1,19 @@
+command_not_found_handler() {
+    # Check if the command is available in the package database
+    if pacman -Ss "^$1$" > /dev/null 2>&1; then
+        echo "Command '$1' not found. Would you like to install the package? [Y/n]"
+        read -r response
+        if [[ $response =~ ^([yY][eE][sS]|[yY])$ ]]; then
+            sudo pacman -S $1
+        else
+            echo "Package installation skipped."
+        fi
+    else
+        echo "Command '$1' not found and no matching package found in repositories."
+    fi
+}
+
+# Make sure this function is called when a command is not found
+zsh_command_not_found() {
+    command_not_found_handler "$1"
+}
