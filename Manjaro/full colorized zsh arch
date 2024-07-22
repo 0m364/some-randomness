@@ -74,7 +74,7 @@ alias du="du -h"
 
 
  source ~/path/to/fsh/fast-syntax-highlighting.plugin.zsh
- zinit light zdharma-continuum/fast-syntax-highlighting
+# zinit light zdharma-continuum/fast-syntax-highlighting
 
 
 
@@ -123,10 +123,12 @@ zsh_command_not_found() {
     command_not_found_handler "$1"
 }
 
-zinit wait lucid for \
- atinit"ZINIT[COMPINIT_OPTS]=-C; zicompinit; zicdreplay" \
-    zdharma-continuum/fast-syntax-highlighting \
- blockf \
-    zsh-users/zsh-completions \
- atload"!_zsh_autosuggest_start" \
-    zsh-users/zsh-autosuggestions
+###########################################################################
+#zinit wait lucid for \                                                   #
+# atinit"ZINIT[COMPINIT_OPTS]=-C; zicompinit; zicdreplay" \               #
+#    zdharma-continuum/fast-syntax-highlighting \                         #
+# blockf \                                                                #
+#    zsh-users/zsh-completions \                                          #
+# atload"!_zsh_autosuggest_start" \                                       #
+#    zsh-users/zsh-autosuggestions                                        #
+###########################################################################
