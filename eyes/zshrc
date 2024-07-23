@@ -1,0 +1,135 @@
+# Load colors and set prompt
+autoload -U colors && colors
+PS1="%{$fg[blue]%}%B[%b%{$fg[cyan]%}%n%{$fg[grey]%}%B👀%b%{$fg[cyan]%}%m%{$fg[blue]%}%B]-%b%{$fg[blue]%}%B[%b%{$fg[white]%}%~%{$fg[blue]%}%B]%b
+%{$fg[cyan]%}%B[💀]>>>>%b%{$reset_color%} "
+
+####################################
+                                   #
+# ZSH history file                 #
+HISTSIZE=1000                      #
+SAVEHIST=1000                      #
+HISTFILE=~/.zsh_history            # 
+                                   #
+# Fancy auto-complete              #
+autoload -Uz compinit              #
+zstyle ':completion:*' menu select ########################
+zmodload zsh/complist                                     #
+zstyle ':completion:*' format '>>> %d'                    #
+compinit                                                  #
+_comp_options+=(globdots) # hidden files are included     #
+###########################################################
+###########################################################
+                         
+# Keybindings section
+bindkey -e
+bindkey '^[[7~' beginning-of-line
+bindkey '^[[H' beginning-of-line
+if [[ "${terminfo[khome]}" != "" ]]; then
+  bindkey "${terminfo[khome]}" beginning-of-line
+fi
+bindkey '^[[8~' end-of-line
+bindkey '^[[F' end-of-line
+if [[ "${terminfo[kend]}" != "" ]]; then
+  bindkey "${terminfo[kend]}" end-of-line
+fi
+bindkey '^[[2~' overwrite-mode
+bindkey '^[[3~' delete-char
+bindkey '^[[C' forward-char
+bindkey '^[[D' backward-char
+bindkey '^[[5~' history-beginning-search-backward
+bindkey '^[[6~' history-beginning-search-forward
+bindkey '^[Oc' forward-word
+bindkey '^[Od' backward-word
+bindkey '^[[1;5D' backward-word
+bindkey '^[[1;5C' forward-word
+bindkey '^H' backward-kill-word
+bindkey '^[[Z' undo
+
+export LD_PRELOAD=""
+export EDITOR="vim"
+export PATH="$HOME/bin:/usr/lib/ccache/bin/:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/opt/bin:/usr/bin/core_perl:/usr/games/bin:$PATH"
+
+# Aliases
+alias c="clear"
+alias cd..="cd .."
+alias curl="curl --user-agent 'noleak'"
+alias l="ls -ahls --color=auto"
+alias r="reset"
+alias shred="shred -zf"
+alias sl="ls --color=auto"
+alias vi="vim"
+alias ls="ls --color=auto"
+alias dir="dir --color=auto"
+alias vdir="vdir --color=auto"
+alias grep="grep --color=auto"
+alias fgrep="fgrep --color=auto"
+alias egrep="egrep --color=auto"
+alias wget="wget -c --user-agent 'noleak'"
+alias dd="dd status=progress"
+alias cp="cp -i"
+alias rm="rm -i"
+alias mv="mv -i"
+alias df="df -h"
+alias free="free -h"
+alias du="du -h"
+
+alias update="sudo pacman -Syu && yay -Syu && sudo pacman -Scc && yay -Scc && clear "
+
+
+ source ~/path/to/fsh/fast-syntax-highlighting.plugin.zsh
+#  zinit light zdharma-continuum/fast-syntax-highlighting
+
+
+
+
+# Command not found handler
+command_not_found_handler() {
+    RED='\033[0;31m'
+    GREEN='\033[0;32m'
+    YELLOW='\033[1;33m'
+    NC='\033[0m' # No Color
+
+    if pacman -Ss "^$1$" > /dev/null 2>&1; then
+        echo -e "${YELLOW}Command '$1' not found. Would you like to install the package from official repositories? [Y/n]${NC}"
+        read -r response
+        if [[ $response =~ ^([yY][eE][sS]|[yY])$ ]]; then
+            sudo pacman -S $1
+            if [[ $? -eq 0 ]]; then
+                echo -e "${GREEN}Package '$1' installed successfully.${NC}"
+            else
+                echo -e "${RED}Failed to install package '$1'.${NC}"
+            fi
+        else
+            echo -e "${YELLOW}Package installation skipped.${NC}"
+        fi
+    else
+        if yay -Ss "^$1$" > /dev/null 2>&1; then
+            echo -e "${YELLOW}Command '$1' not found in official repositories. Would you like to install the package from AUR? [Y/n]${NC}"
+            read -r response
+            if [[ $response =~ ^([yY][eE][sS]|[yY])$ ]]; then
+                yay -S $1
+                if [[ $? -eq 0 ]]; then
+                    echo -e "${GREEN}Package '$1' installed successfully from AUR.${NC}"
+                else
+                    echo -e "${RED}Failed to install package '$1' from AUR.${NC}"
+                fi
+            else
+                echo -e "${YELLOW}AUR package installation skipped.${NC}"
+            fi
+        else
+            echo -e "${RED}Command '$1' not found and no matching package found in official repositories or AUR.${NC}"
+        fi
+    fi
+}
+
+zsh_command_not_found() {
+    command_not_found_handler "$1"
+}
+
+# zinit wait lucid for \
+# atinit"ZINIT[COMPINIT_OPTS]=-C; zicompinit; zicdreplay" \
+#    zdharma-continuum/fast-syntax-highlighting \
+# blockf \
+#    zsh-users/zsh-completions \
+# atload"!_zsh_autosuggest_start" \
+#    zsh-users/zsh-autosuggestions
