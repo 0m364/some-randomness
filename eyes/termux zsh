@@ -1,0 +1,56 @@
+source ~/.zinit/bin/zinit.zsh
+
+# Syntax highlighting
+zinit light zdharma-continuum/fast-syntax-highlighting
+
+# Command not found handler
+command_not_found_handler() {
+    RED='\033[0;31m'
+    GREEN='\033[0;32m'
+    YELLOW='\033[1;33m'
+    NC='\033[0m' # No Color
+
+    if [[ "$1" == *\** ]]; then
+        echo -e "${YELLOW}Searching for packages matching '$1'...${NC}"
+        pkg search "${1//\*/}" | grep -i "${1//\*/}" 2>/dev/null
+        pacman -Ss "${1//\*/}" 2>/dev/null
+        return
+    fi
+
+    if pkg search "^$1$" > /dev/null 2>&1; then
+        echo -e "${YELLOW}Command '$1' not found. Would you like to install the package from Termux repos>
+        read -r response
+        if [[ $response =~ ^([yY][eE][sS]|[yY])$ ]]; then
+            pkg install -y $1
+            if [[ $? -eq 0 ]]; then
+                echo -e "${GREEN}Package '$1' installed successfully.${NC}"
+            else
+                echo -e "${RED}Failed to install package '$1'.${NC}"
+            fi
+        else
+            echo -e "${YELLOW}Package installation skipped.${NC}"
+        fi
+    elif pacman -Ss "^$1$" > /dev/null 2>&1; then
+        echo -e "${YELLOW}Command '$1' not found in Termux repositories. Would you like to install the pa>
+        read -r response
+        if [[ $response =~ ^([yY][eE][sS]|[yY])$ ]]; then
+            pacman -S $1
+            if [[ $? -eq 0 ]]; then
+                echo -e "${GREEN}Package '$1' installed successfully.${NC}"
+            else
+                echo -e "${RED}Failed to install package '$1'.${NC}"
+            fi
+        else
+            echo -e "${YELLOW}Pacman package installation skipped.${NC}"
+        fi
+    else
+        echo -e "${RED}Command '$1' not found and no matching package found in Termux or pacman repositor>
+    fi
+}
+
+zsh_command_not_found() {
+    command_not_found_handler "$1"
+}
+
+# Load the custom command-not-found handler
+autoload -U command_not_found_handler
